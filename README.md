@@ -290,31 +290,31 @@ print("regression: ", regression);
 var palette = ['#f7fcb9','#addd8e','#31a354'];
 
 // Display the regression output.
-  // get dictionaries of min & max predicted value
-  var regressionMin = (regression.reduceRegion({
-    reducer: ee.Reducer.min(),
-    scale: 30,
-    crs: 'EPSG:32647',
-    geometry: boundary,
-    bestEffort: true,
-    tileScale: 5
-  }));
-  var regressionMax = (regression.reduceRegion({
-    reducer: ee.Reducer.max(),
-    scale: 30,
-    crs: 'EPSG:32647',
-    geometry: boundary,
-    bestEffort: true,
-    tileScale: 5
-  }));
-  var regressionAvg = (regression.reduceRegion({
-    reducer: ee.Reducer.mean(),
-    scale: 30,
-    crs: 'EPSG:32647',
-    geometry: boundary,
-    bestEffort: true,
-    tileScale: 5
-  }));  
+// Get dictionaries of min & max predicted value
+var regressionMin = (regression.reduceRegion({
+   reducer: ee.Reducer.min(),
+   scale: 30,
+   crs: 'EPSG:32647',
+   geometry: boundary,
+   bestEffort: true,
+   tileScale: 5
+}));
+var regressionMax = (regression.reduceRegion({
+   reducer: ee.Reducer.max(),
+   scale: 30,
+   crs: 'EPSG:32647',
+   geometry: boundary,
+   bestEffort: true,
+   tileScale: 5
+}));
+var regressionAvg = (regression.reduceRegion({
+   reducer: ee.Reducer.mean(),
+   scale: 30,
+   crs: 'EPSG:32647',
+   geometry: boundary,
+   bestEffort: true,
+   tileScale: 5
+}));  
 
 // Add to map
 var viz = {palette: palette, min:regressionMin.getNumber('predicted').getInfo(), max:regressionMax.getNumber('predicted').getInfo()};
