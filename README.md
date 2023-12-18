@@ -52,6 +52,7 @@ This model represents an example of a canopy height prediction workflow. For the
 The research project focuses on the University of Malaya as its study area, leveraging the Sentinel-2 dataset spanning from April 1st, 2021, to June 30th, 2021. Situated at the border of Kuala Lumpur and Petaling Jaya (Selangor), the university campus is nestled within a forested landscape. Notably, within this campus lies Rimba Ilmu (The Forest of Knowledge), a reserved forest established in 1974, covering approximately 80 hectares and hosting remarkable collections. Rimba Ilmu serves a pivotal role, utilizing its extensive resources to educate the public and students about tropical plant life, ecology, and conservation, thus fostering awareness about these critical aspects.
 
 ## Minimal Reproducible Example (JavaScript Code)
+**Important Note:** This example code illustrates the process of conducting canopy height regression modeling utilizing the Random Forest model along with manual feature selection.
 ### Section 1: Boundary Selection
 ```javascript
 // Choose boundary on GEE
@@ -375,3 +376,142 @@ Export.image.toDrive({
 });
 ```
 
+## Result
+### Canopy Height Prediction Results
+
+**Table 1** showcases the outcomes of various machine learning models in predicting canopy height based on the satellite imagery and geographical data utilized in this project:
+
+| No | Machine Learning Model          | Min. Canopy Height (m) | Avg. Canopy Height (m) | Max. Canopy Height (m) |
+|----|--------------------------------|------------------------|------------------------|------------------------|
+| 1  | Random Forest (RF)              | 7.435                  | 13.69                  | 20.847                 |
+| 2  | RF with PCA                     | 5.81                   | 11.714                 | 23.469                 |
+| 3  | Gradient Boost Tree Regression  | 1.466                  | 9.182                  | 22.049                 |
+| 4  | GBTR with PCA                   | 4.457                  | 10.437                 | 20.889                 |
+| 5  | Support Vector Machine (SVM)    | 11.087                 | 12.368                 | 14.058                 |
+| 6  | SVM with PCA                    | 7.809                  | 9.318                  | 12.036                 |
+
+These results demonstrate the variation in minimum, average, and maximum canopy heights predicted by different machine learning models, highlighting each model's potential to effectively estimate canopy height.
+
+### Model Assessment Metrics
+
+**Table 2** represents the assessment metrics of the machine learning models used for canopy height prediction:
+
+| No | Machine Learning Model          | R² Training (70%) | R² Testing (30%) | RMSE (m) Training | RMSE (m) Testing |
+|----|--------------------------------|-------------------|------------------|-------------------|------------------|
+| 1  | Random Forest (RF)              | 0.655             | 0.355            | 7.954             | 5.523            |
+| 2  | RF with PCA                     | 0.731             | 0.721            | 6.814             | 4.05             |
+| 3  | Gradient Boost Tree Regression  | 0.389             | 0.377            | 8.654             | 6.686            |
+| 4  | GBTR with PCA                   | 0.577             | 0.685            | 7.716             | 4.196            |
+| 5  | Support Vector Machine (SVM)    | 0.604             | 0.193            | 9.905             | 7.764            |
+| 6  | SVM with PCA                    | 0.169             | 0.48             | 11.085            | 8.511            |
+
+These metrics gauge the performance of each model in predicting canopy height, providing insights into their training and testing R² values along with the Root Mean Squared Error (RMSE). A higher R² value closer to 1 and lower RMSE values indicate better predictive accuracy.
+
+Describe these tables to highlight the significance of each model's performance metrics in predicting canopy height and assessing the model's accuracy using R² and RMSE values.
+
+## Carbon Stock Estimation
+
+### Aboveground Biomass Density (ABGD) Calculation Results
+
+Using the GEDI L4B dataset and employing the Random Forest modeling method, the aboveground biomass prediction results in the University of Malaya are as follows:
+
+#### Table 3 Aboveground Biomass Prediction Results
+
+| No | Machine Learning Model | Min. AGBD (Mg/ha) | Avg. AGBD (Mg/ha) | Max. AGBD (Mg/ha) |
+|----|------------------------|--------------------|--------------------|--------------------|
+| 1  | Random Forest (RF)     | 21.406             | 41.252             | 68.559             |
+
+#### Table 4 Model Assessment Metrics
+
+| No | Machine Learning Model | R² Training (70%) | R² Testing (30%) | RMSE (Mg/ha) Training | RMSE (Mg/ha) Testing |
+|----|------------------------|-------------------|------------------|------------------------|-----------------------|
+| 1  | Random Forest (RF)     | 0.73              | 0.209            | 29.637                 | 27.751                |
+
+These metrics showcase the effectiveness of the Random Forest model in predicting aboveground biomass density, indicating its potential to estimate biomass with considerable accuracy.
+
+### Tree Area Calculation
+
+The total tree land area within the University of Malaya study area has been calculated:
+```javascript
+// Tree Land area (hectare, ha) in the Study area (University of Malaya)
+// Calculate the tree area in hectares
+var treeArea = forest_mask.select('Map');
+var areaImage = treeArea.multiply(ee.Image.pixelArea());
+
+// Now that each pixel for the forest class in the image has the value
+// equal to its area, we can sum up all the values in the region
+// to get the total forested area.
+var area = areaImage.reduceRegion({
+  reducer: ee.Reducer.sum(),
+  geometry: boundary,
+  scale: 30, // Specify the scale that matches your projection
+  maxPixels: 1e9 // Adjust as needed
+});
+
+// Convert the forested area to hectares
+var treeAreaHectares = ee.Number(area.get('Map')).divide(10000); // 1 square meter = 0.0001 hectares
+
+// Print the tree area in hectares
+print('Tree Area (Hectares) in the University of Malaya:', treeAreaHectares);
+```
+**Tree Area (Hectares) in the University of Malaya: 2109.434 hectares**
+
+### Carbon Storage Calculation
+
+The carbon storage estimation process involves the computation of aboveground carbon storage based on the calculated aboveground biomass density and the specified tree area in the University of Malaya study area:
+
+#### Aboveground Carbon Storage Calculation
+
+```javascript
+// Aboveground Carbon Storage Calculation in Study Area (UM)
+// Formula: Aboveground Carbon Storage (Mg, Megagram also known as tonnes) = Aboveground Biomass (Mg/ha) x Carbon Content Factor x Tree Area (ha)
+
+// Define the inputs
+var minAbovegroundBiomass = 21.406166582107545; // Min aboveground biomass (Mg/ha)
+var maxAbovegroundBiomass = 68.5589729944865;   // Max aboveground biomass (Mg/ha)
+var avgAbovegroundBiomass = 41.252308736491585; // Avg aboveground biomass (Mg/ha)
+var carbonContentFactor = 0.5;                   // Carbon content factor
+var treeArea = 2109.4340347280445;               // Tree area 2109.4340347280445 ha
+
+// Calculate Aboveground Carbon Storage
+var abovegroundCarbonStorageMin = minAbovegroundBiomass * carbonContentFactor * treeArea;
+var abovegroundCarbonStorageMax = maxAbovegroundBiomass * carbonContentFactor * treeArea;
+var abovegroundCarbonStorageAvg = avgAbovegroundBiomass * carbonContentFactor * treeArea;
+
+// Print the results
+print('Aboveground Carbon Storage (Mg, tonnes) in the University of Malaya:');
+print('Minimum Estimate:', abovegroundCarbonStorageMin, 'Mg (tonnes)');
+print('Maximum Estimate:', abovegroundCarbonStorageMax, 'Mg (tonnes)');
+print('Average Estimate:', abovegroundCarbonStorageAvg, 'Mg (tonnes)');
+```
+**Aboveground Carbon Stock Estimation Results**
+
+**Table 5** summarizes the estimates for aboveground carbon stock in the University of Malaya study area:
+
+| No | Aboveground Carbon Stock Area | Min. Carbon (Mg) | Avg. Carbon (Mg) | Max. Carbon (Mg) |
+|----|-------------------------------|------------------|------------------|------------------|
+| 1  | University of Malaya         | 22577.448        | 43509.512        | 72310.316        |
+
+These estimates indicate the potential carbon storage within the specified study area, providing valuable insights into its carbon sequestration capacity and highlighting its significance in environmental assessments and management strategies.
+
+## Conclusion
+
+This project leveraged satellite imagery and machine learning through Google Earth Engine to estimate canopy height and carbon content in the University of Malaya area. By analyzing diverse datasets like Sentinel-1, Sentinel-2, SRTM, ESA WorldCover, GEDI L2A, and GEDI L4B, we gained valuable insights.
+
+### Key Findings
+
+- **Canopy Height Prediction:** Various machine learning models were employed, showcasing the potential to estimate canopy height. Random Forest and RF with Principal Component Analysis emerged as promising models.
+  
+- **Aboveground Biomass Density:** The Random Forest model proved valuable in estimating biomass density, providing insights into vegetation health and carbon sequestration potential.
+
+- **Carbon Storage Assessment:** The estimation of aboveground carbon stocks revealed significant reserves within the University of Malaya area, highlighting its role as a crucial carbon sink.
+
+### Significance
+
+This study sheds light on the University of Malaya's ecosystem, emphasizing its importance in carbon sequestration. Understanding its capacity for storing carbon reinforces the significance of preserving such areas for environmental stability and biodiversity conservation.
+
+### Future Directions
+
+The methodologies employed and findings derived from this research offer implications for environmental assessments and conservation strategies. The accuracy of predictive models and detailed carbon stock estimations could serve as a foundational framework for similar studies globally, aiding ecosystem management and informed decision-making.
+
+In summary, this project underscores the University of Malaya's ecosystem's vital role in carbon sequestration, emphasizing the significance of satellite imagery and machine learning in environmental assessments and conservation endeavors.
