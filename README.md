@@ -494,6 +494,11 @@ print('Average Estimate:', abovegroundCarbonStorageAvg, 'Mg (tonnes)');
 
 These estimates indicate the potential carbon storage within the specified study area, providing valuable insights into its carbon sequestration capacity and highlighting its significance in environmental assessments and management strategies.
 
+## Web Application Showcase
+- [Canopy Height Prediction Random Forest Model without PCA](https://s2155961.users.earthengine.app/view/canopy-height-prediction-um-random-forest)
+- [Canopy Height Prediction Random Forest Model with PCA](https://s2155961.users.earthengine.app/view/canopy-height-prediction-umrf-with-pca)
+- [Aboveground Biomass Prediction Random Forest Model](https://s2155961.users.earthengine.app/view/aboveground-biomass-density-prediction-university-of-malaya)
+
 ## Conclusion
 
 This project leveraged satellite imagery and machine learning through Google Earth Engine to estimate canopy height and carbon content in the University of Malaya area. By analyzing diverse datasets like Sentinel-1, Sentinel-2, SRTM, ESA WorldCover, GEDI L2A, and GEDI L4B, we gained valuable insights.
