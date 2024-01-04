@@ -376,7 +376,7 @@ Export.image.toDrive({
 });
 ```
 
-## Result
+## Results
 ### Canopy Height Prediction Results
 
 **Table 1** showcases the outcomes of various machine learning models in predicting canopy height based on the satellite imagery and geographical data utilized in this project:
