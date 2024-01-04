@@ -31,7 +31,7 @@ This project uses satellite imagery on [Google Earth Engine](https://earthengine
   - Extract ”Slope” and “Elevation” as predictor variables.
   
 - [European Space Agency (ESA) WorldCover 10m](https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v100):
-  ESA dataset is lunched since there is a massive need for accurate, timely, and high-resolution information on land cover, land use, and earth surface change.
+  The ESA dataset was launched since there is a massive need for accurate, timely, and high-resolution information on land cover, land use, and earth surface change.
   - Use value 10 (Tree Cover only) as a predictor variable.
   
 - [GEDI L2A Raster Canopy Top Height](https://developers.google.com/earth-engine/datasets/catalog/LARSE_GEDI_GEDI02_A_002_MONTHLY):
